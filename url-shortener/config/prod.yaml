@@ -1,0 +1,16 @@
+env: "prod"
+
+postgres:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: "apple"
+  dbname: "url_shortener"
+  sslmode: "disable"
+
+http_server:
+  address: "0.0.0.0:8082"
+  timeout: 4s
+  idle_timeout: 30s
+  user: "Shabby8574"
+  password: "supersecret"
