@@ -2,11 +2,12 @@ package redirect
 
 import (
 	"errors"
+	"log/slog"
+	"net/http"
+
 	resp "go-postgres-test/internal/lib/api/response"
 	"go-postgres-test/internal/lib/logger/sl"
 	"go-postgres-test/internal/storage"
-	"log/slog"
-	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -22,34 +23,42 @@ func New(log *slog.Logger, urlGetter URLGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.url.redirect.New"
 
-		log = log.With(
+		reqLog := log.With( // CHANGED
 			slog.String("op", op),
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
 		alias := chi.URLParam(r, "alias")
 		if alias == "" {
-			log.Info("alias is empty")
+			reqLog.Info("alias is empty") // CHANGED
 
+			w.WriteHeader(http.StatusBadRequest) // CHANGED
 			render.JSON(w, r, resp.Error("invalid request"))
-
 			return
 		}
+
 		resURL, err := urlGetter.GetURL(alias)
 		if errors.Is(err, storage.ErrURLNotFound) {
-			log.Info("url not found", "alias", alias)
+			reqLog.Info("url not found", slog.String("alias", alias)) // CHANGED
+
+			w.WriteHeader(http.StatusNotFound) // CHANGED
 			render.JSON(w, r, resp.Error("not found"))
-
 			return
 		}
+
 		if err != nil {
-			log.Error("failed to get url", sl.Err(err))
+			reqLog.Error("failed to get url", sl.Err(err)) // CHANGED
 
+			w.WriteHeader(http.StatusInternalServerError) // CHANGED
 			render.JSON(w, r, resp.Error("internal error"))
-
 			return
 		}
-		log.Info("got url", slog.String("url", resURL))
+
+		reqLog.Info( // CHANGED
+			"got url",
+			slog.String("alias", alias),
+			slog.String("url", resURL),
+		)
 
 		http.Redirect(w, r, resURL, http.StatusFound)
 	}
