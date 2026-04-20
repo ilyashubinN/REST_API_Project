@@ -39,7 +39,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	id, err := storage.SaveURL("https://google.com", "google11212111")
+	/*id, err := storage.SaveURL("https://google.com", "google11212111")
 	if err != nil {
 		log.Error("failed to save url", sl.Err(err))
 		os.Exit(1)
@@ -51,7 +51,7 @@ func main() {
 	if err != nil {
 		log.Error("failed to save url", sl.Err(err))
 		os.Exit(1)
-	}
+	}*/
 
 	_ = storage
 
