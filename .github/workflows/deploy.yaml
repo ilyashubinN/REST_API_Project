@@ -59,7 +59,7 @@ jobs:
       - name: List workspace contents
         run: |
           echo "Listing deployment folder contents:"
-          ls -la ${{ github.workspace }}/deployment
+          ls -la ${{ github.workspace }}/url-shortener/deployment
 
       - name: Create environment file on server
         run: |
